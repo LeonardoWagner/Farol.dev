@@ -1,0 +1,126 @@
+/* Farol.dev — responsive layout rules.
+   Inline styles hold colors/typography tokens (unaffected by viewport); these
+   classes hold the structural properties (grid columns, padding, font-size)
+   that actually need to change across breakpoints. */
+
+.farol-header__nav {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.farol-header__toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.farol-section {
+  padding: 80px 40px;
+}
+
+.farol-services-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.farol-cases-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.farol-about-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 48px;
+  align-items: center;
+  margin-bottom: 56px;
+}
+
+.farol-about-pillars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 40px;
+}
+
+.farol-hero {
+  padding: 120px 40px 100px;
+}
+
+.farol-hero__title {
+  font-size: 52px;
+}
+
+.farol-footer {
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .farol-services-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .farol-header__nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    background: var(--color-black);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 12px 20px 20px;
+  }
+  .farol-header__nav.is-open {
+    display: flex;
+  }
+  .farol-header__toggle {
+    display: inline-flex;
+  }
+  .farol-header__cta {
+    display: none;
+  }
+  .farol-hero {
+    padding: 90px 20px 60px;
+  }
+  .farol-hero__title {
+    font-size: 34px;
+  }
+  .farol-section {
+    padding: 56px 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .farol-services-grid,
+  .farol-cases-grid {
+    grid-template-columns: 1fr;
+  }
+  .farol-about-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .farol-about-pillars {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .farol-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

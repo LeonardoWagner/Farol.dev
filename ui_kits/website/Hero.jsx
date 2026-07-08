@@ -21,15 +21,15 @@ function FarolBeam({ style }) {
 
 function FarolHero({ onCTA }) {
   return (
-    <section style={{ position: 'relative', background: 'var(--color-black)', padding: '120px 40px 100px', overflow: 'hidden' }}>
+    <section className="farol-hero" style={{ position: 'relative', background: 'var(--color-black)', overflow: 'hidden' }}>
       <FarolBeam />
       <div style={{ position: 'relative', maxWidth: '680px' }}>
         <p style={{
           fontFamily: 'var(--font-body)', fontSize: '13px', fontWeight: 600, letterSpacing: 'var(--tracking-wide)',
           textTransform: 'uppercase', color: 'var(--text-secondary)', marginBottom: '18px',
         }}>Software Studio</p>
-        <h1 style={{
-          fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '52px', lineHeight: 'var(--leading-tight)',
+        <h1 className="farol-hero__title" style={{
+          fontFamily: 'var(--font-display)', fontWeight: 700, lineHeight: 'var(--leading-tight)',
           letterSpacing: 'var(--tracking-tight)', color: '#fff', margin: '0 0 22px',
         }}>
           <span style={{ fontStyle: 'italic' }}>Construímos produtos digitais que</span> <span style={{ color: 'var(--color-coral)' }}>resolvem</span> <span style={{ fontStyle: 'italic' }}>problemas reais.</span>

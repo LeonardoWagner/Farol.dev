@@ -1,6 +1,14 @@
 function FarolHeader({ active, onNavigate, onCTA }) {
   const { IconButton } = window.FarolDevDesignSystem_199cc2;
+  const [menuOpen, setMenuOpen] = React.useState(false);
   const items = ['Soluções', 'Cases', 'Sobre', 'Contato'];
+
+  const handleNavClick = (e, item) => {
+    e.preventDefault();
+    setMenuOpen(false);
+    item === 'Contato' ? (onCTA && onCTA()) : (onNavigate && onNavigate(item));
+  };
+
   return (
     <header style={{
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -14,11 +22,11 @@ function FarolHeader({ active, onNavigate, onCTA }) {
           Farol<span style={{ color: 'var(--color-coral)' }}>.dev</span>
         </span>
       </div>
-      <nav style={{ display: 'flex', gap: '28px' }}>
+      <nav className={`farol-header__nav${menuOpen ? ' is-open' : ''}`}>
         {items.map((item) => (
           <a
             key={item}
-            onClick={(e) => { e.preventDefault(); item === 'Contato' ? (onCTA && onCTA()) : (onNavigate && onNavigate(item)); }}
+            onClick={(e) => handleNavClick(e, item)}
             href={item === 'Contato' ? undefined : `#${item}`}
             style={{
               fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 500,
@@ -31,16 +39,27 @@ function FarolHeader({ active, onNavigate, onCTA }) {
           </a>
         ))}
       </nav>
-      <button
-        onClick={onCTA}
-        style={{
-          background: 'var(--color-coral)', color: '#0F1115', border: 'none',
-          borderRadius: 'var(--radius-full)', padding: '9px 20px', fontWeight: 600,
-          fontFamily: 'var(--font-body)', fontSize: '14px', cursor: 'pointer',
-        }}
-      >
-        Falar com a gente
-      </button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <button
+          onClick={onCTA}
+          className="farol-header__cta"
+          style={{
+            background: 'var(--color-coral)', color: '#0F1115', border: 'none',
+            borderRadius: 'var(--radius-full)', padding: '9px 20px', fontWeight: 600,
+            fontFamily: 'var(--font-body)', fontSize: '14px', cursor: 'pointer',
+          }}
+        >
+          Falar com a gente
+        </button>
+        <button
+          className="farol-header__toggle"
+          onClick={() => setMenuOpen((v) => !v)}
+          aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
+          style={{ fontSize: '22px' }}
+        >
+          {menuOpen ? '✕' : '☰'}
+        </button>
+      </div>
     </header>
   );
 }

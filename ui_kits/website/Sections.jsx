@@ -6,9 +6,9 @@ function FarolServices() {
     { title: 'Ut enim ad minim', desc: 'Ut enim ad minim veniam, quis nostrud exercitation.', tag: 'Dolor' },
   ];
   return (
-    <section id="Soluções" style={{ padding: '80px 40px', background: 'var(--color-black)' }}>
+    <section id="Soluções" className="farol-section" style={{ background: 'var(--color-black)' }}>
       <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '32px', color: '#fff', margin: '0 0 40px' }}>Soluções</h2>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+      <div className="farol-services-grid">
         {services.map((s) => (
           <Card key={s.title}>
             <Badge color="coral" style={{ marginBottom: '14px' }}>{s.tag}</Badge>
@@ -24,9 +24,9 @@ function FarolServices() {
 function FarolCases() {
   const { Card } = window.FarolDevDesignSystem_199cc2;
   return (
-    <section id="Cases" style={{ padding: '80px 40px', background: 'var(--surface-raised)' }}>
+    <section id="Cases" className="farol-section" style={{ background: 'var(--surface-raised)' }}>
       <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '32px', color: '#fff', margin: '0 0 40px' }}>Cases</h2>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
+      <div className="farol-cases-grid">
         <Card>
           <p style={{ fontFamily: 'var(--font-mono)', fontSize: '13px', color: 'var(--color-success)', margin: '0 0 10px' }}>Lorem ipsum</p>
           <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '20px', color: '#fff', margin: '0 0 8px' }}>Lorem ipsum dolor sit</h3>
@@ -49,9 +49,9 @@ function FarolAbout() {
     { color: 'var(--color-teal)', label: 'Entrega', desc: 'Ut enim ad minim veniam, quis nostrud exercitation.' },
   ];
   return (
-    <section id="Sobre" style={{ padding: '80px 40px', background: 'var(--color-black)' }}>
+    <section id="Sobre" className="farol-section" style={{ background: 'var(--color-black)' }}>
       <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '32px', color: '#fff', margin: '0 0 40px' }}>Sobre</h2>
-      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '48px', alignItems: 'center', marginBottom: '56px' }}>
+      <div className="farol-about-grid">
         <div>
           <p style={{ fontFamily: 'var(--font-body)', fontSize: '17px', color: 'var(--text-secondary)', lineHeight: 'var(--leading-relaxed)', margin: '0 0 20px' }}>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt
@@ -73,7 +73,7 @@ function FarolAbout() {
           img
         </div>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '32px', borderTop: '1px solid var(--border-subtle)', paddingTop: '40px' }}>
+      <div className="farol-about-pillars">
         {pillars.map((p) => (
           <div key={p.label} style={{ display: 'flex', gap: '14px' }}>
             <span style={{ width: '14px', height: '14px', borderRadius: '50%', background: p.color, marginTop: '4px', flexShrink: 0 }} />

@@ -1,6 +1,6 @@
 function FarolFooter() {
   return (
-    <footer style={{
+    <footer className="farol-footer" style={{
       padding: '48px 40px', borderTop: '1px solid var(--border-subtle)',
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       fontFamily: 'var(--font-body)', color: 'var(--text-secondary)', fontSize: '13px',
