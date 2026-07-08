@@ -1,0 +1,147 @@
+/* Farol.dev — Color tokens
+   Source: brandbook palette (uploads/brandbook.pdf, brand overview image) */
+
+:root {
+  /* Base palette */
+  --color-black: #0F1115;      /* Preto Profundo */
+  --color-white: #FAFAFA;      /* Branco */
+  --color-coral: #FF6B57;      /* Coral — primary accent, CTAs */
+  --color-blue: #4C6FFF;       /* Azul */
+  --color-purple: #8A5CFF;     /* Lilás */
+  --color-teal: #3ED8B6;       /* Verde Água */
+  --color-gray-dark: #1C1F26;  /* Cinza Escuro — surfaces */
+  --color-gray-medium: #8B8F98;/* Cinza Médio — secondary text */
+
+  /* Gray scale (derived, for UI needs the brandbook doesn't cover explicitly) */
+  --color-gray-900: #0F1115;
+  --color-gray-800: #1C1F26;
+  --color-gray-700: #2A2E37;
+  --color-gray-600: #40454F;
+  --color-gray-500: #5B6068;
+  --color-gray-400: #8B8F98;
+  --color-gray-300: #B4B7BE;
+  --color-gray-200: #D8D9DD;
+  --color-gray-100: #EDEDEF;
+  --color-gray-50:  #FAFAFA;
+
+  /* Brand gradient — coral → lilás → azul (used in logo, hero beams, CTAs) */
+  --gradient-brand: linear-gradient(90deg, var(--color-coral) 0%, var(--color-purple) 55%, var(--color-blue) 100%);
+  --gradient-brand-radial: radial-gradient(circle at 30% 30%, var(--color-coral) 0%, var(--color-purple) 55%, var(--color-blue) 100%);
+
+  /* Semantic surfaces — Farol.dev is a dark-first brand */
+  --surface-app: var(--color-black);
+  --surface-raised: var(--color-gray-dark);
+  --surface-overlay: #14161C;
+  --surface-inverse: var(--color-white);
+  --surface-card: var(--color-gray-dark);
+  --surface-card-border: #2A2E37;
+
+  /* Text */
+  --text-primary: var(--color-white);
+  --text-secondary: var(--color-gray-medium);
+  --text-inverse: var(--color-black);
+  --text-accent: var(--color-coral);
+  --text-link: var(--color-blue);
+  --text-link-hover: var(--color-purple);
+
+  /* Semantic / feedback (derived from palette — no explicit semantic colors in brandbook) */
+  --color-success: var(--color-teal);
+  --color-info: var(--color-blue);
+  --color-warning: #F2B84B;
+  --color-danger: #FF5C5C;
+
+  /* Borders */
+  --border-subtle: #2A2E37;
+  --border-default: #40454F;
+  --border-strong: var(--color-gray-medium);
+
+  /* Focus ring */
+  --focus-ring: var(--color-blue);
+}
+
+/* Farol.dev — Typography tokens
+   Brandbook fonts: Satoshi (display/headings), Inter (body/UI), JetBrains Mono (code)
+   NOTE: Satoshi is not distributed on Google Fonts. Substituted with Plus Jakarta Sans
+   (closest free geometric-grotesk match) — loaded via Google Fonts in index.html. */
+
+:root {
+  --font-display: 'Plus Jakarta Sans', 'Satoshi', -apple-system, sans-serif; /* substitute for Satoshi */
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  /* Weights */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-bold: 700;
+
+  /* Type scale (px) */
+  --text-display-xl: 64px;
+  --text-display-l: 48px;
+  --text-display-m: 36px;
+  --text-display-s: 28px;
+  --text-heading-l: 24px;
+  --text-heading-m: 20px;
+  --text-heading-s: 18px;
+  --text-body-l: 18px;
+  --text-body-m: 16px;
+  --text-body-s: 14px;
+  --text-caption: 12px;
+  --text-mono-m: 14px;
+  --text-mono-s: 13px;
+
+  /* Line heights */
+  --leading-tight: 1.1;
+  --leading-snug: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.6;
+
+  /* Letter spacing */
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.08em;   /* used for eyebrow/label caps, e.g. "SOFTWARE STUDIO" */
+  --tracking-widest: 0.14em;
+}
+
+/* Farol.dev — Spacing, radii, shadow & motion tokens (derived; brandbook is high-level
+   and doesn't specify a numeric spacing/elevation system, so this follows a standard
+   4px-based scale suited to the dark, high-tech visual language of the brand). */
+
+:root {
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  /* Radii — logo icon uses a soft-squircle app-icon corner; UI follows a moderate,
+     confident rounding (not pill-happy, not sharp) */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+  --radius-full: 999px;
+
+  /* Shadows — dark UI, so elevation reads mostly through subtle borders + soft dark
+     drop shadows, plus an occasional brand-glow used behind hero art / active states */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.45);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.5);
+  --shadow-glow-coral: 0 0 40px rgba(255,107,87,0.35);
+  --shadow-glow-blue: 0 0 40px rgba(76,111,255,0.35);
+  --shadow-glow-brand: 0 0 60px rgba(138,92,255,0.3);
+
+  /* Motion — subtle, confident, no bounce (matches "alta tecnologia e confiança" tone) */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --duration-fast: 120ms;
+  --duration-normal: 200ms;
+  --duration-slow: 400ms;
+}

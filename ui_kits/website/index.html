@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Farol.dev</title>
+<link rel="icon" href="../../assets/logo/farol-icon.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="../../styles/tokens.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--color-black); }
+  a { color: var(--text-link); }
+  a:hover { color: var(--text-link-hover); }
+</style>
+
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="../../components/core/Badge.jsx"></script>
+<script type="text/babel" src="../../components/core/IconButton.jsx"></script>
+<script type="text/babel" src="../../components/data/Card.jsx"></script>
+
+<script type="text/babel" src="Header.jsx"></script>
+<script type="text/babel" src="Hero.jsx"></script>
+<script type="text/babel" src="Sections.jsx"></script>
+<script type="text/babel" src="Footer.jsx"></script>
+
+<script type="text/babel">
+function App() {
+  const [active, setActive] = React.useState('Soluções');
+
+  const scrollTo = (id) => {
+    setActive(id);
+    const el = document.getElementById(id);
+    if (el) window.scrollTo({ top: el.offsetTop - 70, behavior: 'smooth' });
+  };
+
+  // "Falar com a gente" routes straight to WhatsApp — no contact-form modal.
+  const goToContact = () => {
+    window.open('https://wa.me/5545998000928?text=Ol%C3%A1!%20Estava%20navegando%20no%20site%20de%20voc%C3%AAs%20e%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es.', '_blank');
+  };
+
+  return (
+    <div>
+      <FarolHeader active={active} onNavigate={scrollTo} onCTA={goToContact} />
+      <FarolHero onCTA={goToContact} />
+      <FarolServices />
+      <FarolCases />
+      <FarolAbout />
+      <FarolFooter />
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
