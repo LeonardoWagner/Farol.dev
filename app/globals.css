@@ -1,0 +1,218 @@
+@import "tailwindcss";
+
+/* Farol.dev — design tokens ported from the brandbook (ex-styles/tokens.css).
+   Only categories without a matching native Tailwind v4 scale are ported into
+   @theme (colors, fonts, type scale, tracking/leading, radii, shadows).
+   Spacing is skipped — Tailwind's default 4px-based scale already matches 1:1.
+   Motion (duration/ease) lives in lib/motion-tokens.ts for GSAP/Framer Motion;
+   the plain CSS vars below are only for hover-state transitions written in CSS. */
+@theme {
+  --color-black: #0f1115;
+  --color-white: #fafafa;
+  --color-coral: #ff6b57;
+  --color-blue: #4c6fff;
+  --color-purple: #8a5cff;
+  --color-teal: #3ed8b6;
+  --color-gray-dark: #1c1f26;
+  --color-gray-medium: #8b8f98;
+
+  --color-gray-900: #0f1115;
+  --color-gray-800: #1c1f26;
+  --color-gray-700: #2a2e37;
+  --color-gray-600: #40454f;
+  --color-gray-500: #5b6068;
+  --color-gray-400: #8b8f98;
+  --color-gray-300: #b4b7be;
+  --color-gray-200: #d8d9dd;
+  --color-gray-100: #ededef;
+  --color-gray-50: #fafafa;
+
+  --color-success: #3ed8b6;
+  --color-info: #4c6fff;
+  --color-warning: #f2b84b;
+  --color-danger: #ff5c5c;
+
+  --font-display: var(--font-plus-jakarta), 'Satoshi', -apple-system, sans-serif;
+  --font-body: var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, 'SFMono-Regular', monospace;
+
+  --text-display-xl: 4rem;
+  --text-display-xl--line-height: 1.1;
+  --text-display-l: 3rem;
+  --text-display-l--line-height: 1.1;
+  --text-display-m: 2.25rem;
+  --text-display-m--line-height: 1.15;
+  --text-display-s: 1.75rem;
+  --text-display-s--line-height: 1.25;
+  --text-heading-l: 1.5rem;
+  --text-heading-l--line-height: 1.25;
+  --text-heading-m: 1.25rem;
+  --text-heading-m--line-height: 1.3;
+  --text-heading-s: 1.125rem;
+  --text-heading-s--line-height: 1.35;
+  --text-body-l: 1.125rem;
+  --text-body-l--line-height: 1.6;
+  --text-body-m: 1rem;
+  --text-body-m--line-height: 1.5;
+  --text-body-s: 0.875rem;
+  --text-body-s--line-height: 1.5;
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1.4;
+  --text-mono-m: 0.875rem;
+  --text-mono-m--line-height: 1.4;
+  --text-mono-s: 0.8125rem;
+  --text-mono-s--line-height: 1.4;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0em;
+  --tracking-wide: 0.08em;
+  --tracking-widest: 0.14em;
+
+  --leading-tight: 1.1;
+  --leading-snug: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.6;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.5);
+  --shadow-glow-coral: 0 0 40px rgba(255, 107, 87, 0.35);
+  --shadow-glow-blue: 0 0 40px rgba(76, 111, 255, 0.35);
+  --shadow-glow-brand: 0 0 60px rgba(138, 92, 255, 0.3);
+}
+
+/* Semantic surfaces/text — dark-first brand, no light theme. Plain CSS vars
+   (not Tailwind theme keys) since these are semantic aliases, not raw scales. */
+:root {
+  --surface-app: var(--color-black);
+  --surface-raised: var(--color-gray-dark);
+  --surface-overlay: #14161c;
+  --surface-card: var(--color-gray-dark);
+  --surface-card-border: #2a2e37;
+
+  --text-primary: var(--color-white);
+  --text-secondary: var(--color-gray-medium);
+  --text-accent: var(--color-coral);
+  --text-link: var(--color-blue);
+  --text-link-hover: var(--color-purple);
+
+  --border-subtle: #2a2e37;
+  --border-default: #40454f;
+  --border-strong: var(--color-gray-medium);
+  --focus-ring: var(--color-blue);
+
+  /* Motion — CSS-only hover transitions. GSAP/Framer Motion use lib/motion-tokens.ts instead. */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --duration-fast: 120ms;
+  --duration-normal: 200ms;
+  --duration-slow: 400ms;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--surface-app);
+  color: var(--text-primary);
+}
+
+::selection {
+  background: var(--color-coral);
+  color: var(--color-black);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Hero sea layer — slow horizontal drift (two identical tiles, translated by
+   exactly half their combined width, so the loop has no visible seam) and a
+   gentle boat bob. Neutralized automatically under reduced-motion by the
+   blanket rule below (animation-duration: 0.001ms !important). */
+@keyframes wave-drift {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes boat-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-7px) rotate(2deg);
+  }
+}
+
+/* Ambient section lighting (components/brand/BrandGlow.tsx +
+   components/lighting/SectionLighting.tsx). Centering is baked into every
+   step (see BrandGlow's comment for why) and the pulse reads --base-opacity
+   so each glow breathes relative to its own configured intensity rather than
+   all converging on the same brightness. */
+@keyframes ambient-drift {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(calc(-50% + 3%), calc(-50% - 4%)) scale(1.06);
+  }
+  100% {
+    transform: translate(calc(-50% - 3%), calc(-50% + 3%)) scale(0.97);
+  }
+}
+
+@keyframes ambient-pulse {
+  0%,
+  100% {
+    opacity: var(--base-opacity, 1);
+  }
+  50% {
+    opacity: calc(var(--base-opacity, 1) * 0.55);
+  }
+}
+
+/* Button hover/focus "signal" pulse — an expanding, fading ring. Applied only
+   via group-hover/group-focus-visible (see Button.tsx), never running while
+   idle. */
+@keyframes button-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 107, 87, 0.45);
+  }
+  100% {
+    box-shadow: 0 0 0 16px rgba(255, 107, 87, 0);
+  }
+}
+
+/* Card hover scan-light sweep (see GlowCard.tsx) — one pass, not a loop
+   (no `infinite`), so re-hovering is what retriggers it. */
+@keyframes scan-light {
+  from {
+    transform: translateX(-20%) skewX(-12deg);
+  }
+  to {
+    transform: translateX(420%) skewX(-12deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
