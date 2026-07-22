@@ -3,12 +3,39 @@
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { PLATFORM_TOP_Y } from './LighthouseBase';
 
 const LIGHTHOUSE_X = 1.7;
 const LIGHTHOUSE_Z = -1;
-const WATER_Y = -0.6;
-const TOWER_HEIGHT = 2.6;
-const LANTERN_Y = WATER_Y + TOWER_HEIGHT + 0.15;
+
+// Tower body built as three stacked, banded segments instead of one long
+// tapered cylinder — this is what actually reads as "lighthouse" rather than
+// "obelisk": alternating off-white/navy bands, a gallery that's much wider
+// than the tower, and a railing all break up what used to be a single
+// unbroken vertical silhouette. Overall tower height is ~25% shorter than
+// the previous single-cylinder version (2.6 → 1.95 world units) and the
+// base radius is ~36% wider (0.22 → 0.30), per the brief's "shorter, wider,
+// less tapered" direction.
+const SEG_A_HEIGHT = 0.85; // base segment, off-white
+const SEG_B_HEIGHT = 0.65; // mid segment, navy
+const SEG_C_HEIGHT = 0.35; // upper segment, off-white
+const RING_HEIGHT = 0.05;
+const TOWER_HEIGHT = SEG_A_HEIGHT + SEG_B_HEIGHT + SEG_C_HEIGHT + RING_HEIGHT * 2;
+
+const GALLERY_Y = PLATFORM_TOP_Y + TOWER_HEIGHT;
+const GALLERY_RADIUS = 0.42;
+const RAIL_Y = GALLERY_Y + 0.14;
+const LANTERN_ROOM_HEIGHT = 0.32;
+const LANTERN_Y = RAIL_Y + 0.05 + LANTERN_ROOM_HEIGHT / 2;
+const ROOF_Y = LANTERN_Y + LANTERN_ROOM_HEIGHT / 2 + 0.14;
+
+// 10 evenly spaced guard-rail posts around the gallery — a fixed, deterministic
+// layout (not randomized), computed once at module scope since it never
+// changes.
+const RAIL_POSTS = Array.from({ length: 10 }, (_, i) => {
+  const angle = (i / 10) * Math.PI * 2;
+  return [Math.cos(angle) * (GALLERY_RADIUS - 0.03), Math.sin(angle) * (GALLERY_RADIUS - 0.03)] as const;
+});
 
 type TrapezoidSpec = {
   apex: number; // half-width at the near edge
@@ -45,9 +72,12 @@ function useTrapezoidGeometry(spec: TrapezoidSpec) {
 // no matter how the shader was tuned. Layering a tight bright core inside a
 // wider, softer cone inside an even wider, dimmer halo is what actually sells
 // volume/falloff without a real volumetric-lighting render pass.
-const CORE_SPEC: TrapezoidSpec = { apex: 0.03, apexZ: 0.2, baseX: 0.9, baseY: 1.5, baseZ: 2.6 };
-const CONE_SPEC: TrapezoidSpec = { apex: 0.07, apexZ: 0.24, baseX: 2.9, baseY: 3.3, baseZ: 5.4 };
-const HALO_SPEC: TrapezoidSpec = { apex: 0.22, apexZ: 0.28, baseX: 4.1, baseY: 3.35, baseZ: 5.6 };
+// apexZ pushed out to clear the lantern room's own radius (~0.24) and its
+// mullions — the beam now visibly starts at the windows' edge instead of
+// originating from inside the housing geometry.
+const CORE_SPEC: TrapezoidSpec = { apex: 0.05, apexZ: 0.27, baseX: 0.9, baseY: 1.5, baseZ: 2.6 };
+const CONE_SPEC: TrapezoidSpec = { apex: 0.1, apexZ: 0.31, baseX: 2.9, baseY: 3.3, baseZ: 5.4 };
+const HALO_SPEC: TrapezoidSpec = { apex: 0.26, apexZ: 0.35, baseX: 4.1, baseY: 3.35, baseZ: 5.6 };
 
 const beamVertexShader = /* glsl */ `
   varying vec2 vUv;
@@ -228,64 +258,136 @@ export function LighthouseModel({
           the tower visually to the lantern above it. */}
       <pointLight position={[0.9, LANTERN_Y - 0.9, 1.2]} color="#FF8F73" intensity={0.3} distance={3.5} decay={2} />
 
-      {/* Tower — slightly warmed dark navy (not pure black) + a faint coral
-          emissive undertone on the side facing the lantern, for "volume". */}
-      <mesh position={[0, WATER_Y + TOWER_HEIGHT / 2, 0]}>
-        {/* openEnded: true — the flat top cap disk was catching light at a
-            steep camera angle and reading as a stray triangular highlight,
-            not as part of the tower's silhouette. The lantern housing sits
-            right above and hides the now-open top. */}
-        <cylinderGeometry args={[0.12, 0.22, TOWER_HEIGHT, 24, 1, true]} />
+      {/* --- Tower body: three banded segments, off-white / navy / off-white,
+          instead of one long tapered cylinder. The alternating bands and the
+          much-wider gallery above are what break the old "single dark
+          silhouette" problem. --- */}
+      <mesh position={[0, PLATFORM_TOP_Y + SEG_A_HEIGHT / 2, 0]}>
+        <cylinderGeometry args={[0.28, 0.3, SEG_A_HEIGHT, 20]} />
+        {/* Self-lit emissive rather than relying on the scene's dim, cool-
+            toned lights to reveal this as "off-white" — under this scene's
+            actual illumination a plain light-colored diffuse still renders
+            almost as dark as the navy segment, which defeats the point of
+            banding. */}
+        <meshStandardMaterial color="#E4DECF" emissive="#4A4638" emissiveIntensity={0.35} roughness={0.55} metalness={0.08} />
+      </mesh>
+      {/* Small door notch at the tower's own base, facing the camera */}
+      <mesh position={[0, PLATFORM_TOP_Y + 0.16, 0.29]}>
+        <planeGeometry args={[0.12, 0.24]} />
+        <meshStandardMaterial color="#171B26" roughness={0.9} />
+      </mesh>
+      <mesh position={[0, PLATFORM_TOP_Y + SEG_A_HEIGHT + RING_HEIGHT / 2, 0]}>
+        <cylinderGeometry args={[0.245, 0.28, RING_HEIGHT, 20]} />
+        <meshStandardMaterial color="#141A2C" roughness={0.4} metalness={0.25} />
+      </mesh>
+      <mesh position={[0, PLATFORM_TOP_Y + SEG_A_HEIGHT + RING_HEIGHT + SEG_B_HEIGHT / 2, 0]}>
+        <cylinderGeometry args={[0.24, 0.245, SEG_B_HEIGHT, 20]} />
         <meshStandardMaterial
-          color="#242A3B"
+          color="#1B2440"
           roughness={0.5}
           metalness={0.16}
-          emissive="#2A140E"
-          emissiveIntensity={0.25}
+          emissive="#160E1E"
+          emissiveIntensity={0.2}
         />
       </mesh>
-      {/* Tonal band */}
-      <mesh position={[0, WATER_Y + TOWER_HEIGHT * 0.55, 0]}>
-        <cylinderGeometry args={[0.166, 0.176, 0.12, 24]} />
-        <meshStandardMaterial color="#525A6E" roughness={0.35} metalness={0.2} />
+      {/* Small lit window partway up the mid segment */}
+      <mesh position={[0, PLATFORM_TOP_Y + SEG_A_HEIGHT + RING_HEIGHT + SEG_B_HEIGHT * 0.6, 0.235]}>
+        <planeGeometry args={[0.08, 0.1]} />
+        <meshStandardMaterial color="#FFD9C7" emissive="#FF8F73" emissiveIntensity={0.55} roughness={0.5} />
       </mesh>
-      {/* Thin lit accent ring bridging tower and lantern — a small structural
-          detail (the "trim" between body and lamp room) that also catches
-          the coral rim light, reinforcing the tower→lantern connection. */}
-      <mesh position={[0, LANTERN_Y - 0.15, 0]}>
-        <torusGeometry args={[0.135, 0.012, 8, 24]} />
+      <mesh position={[0, PLATFORM_TOP_Y + SEG_A_HEIGHT + RING_HEIGHT + SEG_B_HEIGHT + RING_HEIGHT / 2, 0]}>
+        <cylinderGeometry args={[0.195, 0.24, RING_HEIGHT, 20]} />
         <meshStandardMaterial
           color="#3A2A24"
           roughness={0.4}
           metalness={0.3}
           emissive="#FF8F73"
-          emissiveIntensity={0.35}
+          emissiveIntensity={0.3}
         />
       </mesh>
-      {/* Lantern room — solid dark housing with a low dome cap. (A translucent
-          "glass" version was tried, but the rotating beam's apex sits at this
-          same point and showed through it in a confusing way — opaque reads
-          more cleanly at this small scale.) */}
-      <mesh position={[0, LANTERN_Y, 0]}>
-        <cylinderGeometry args={[0.14, 0.14, 0.24, 24]} />
-        <meshStandardMaterial color="#1B2030" roughness={0.85} metalness={0.05} />
-      </mesh>
-      {/* Thin glowing frame around the lantern glass, top and bottom — reads
-          as a lit window frame rather than a flat cylinder end. */}
-      <mesh position={[0, LANTERN_Y + 0.12, 0]}>
-        <torusGeometry args={[0.14, 0.008, 6, 24]} />
-        <meshStandardMaterial color="#FFD9C7" emissive="#FF8F73" emissiveIntensity={0.8} roughness={0.4} />
-      </mesh>
-      <mesh position={[0, LANTERN_Y + 0.13, 0]}>
-        <sphereGeometry args={[0.14, 24, 16, 0, Math.PI * 2, 0, Math.PI / 2.2]} />
-        <meshStandardMaterial color="#12151F" roughness={0.9} metalness={0.05} />
+      <mesh position={[0, PLATFORM_TOP_Y + TOWER_HEIGHT - SEG_C_HEIGHT / 2, 0]}>
+        <cylinderGeometry args={[0.19, 0.195, SEG_C_HEIGHT, 20]} />
+        <meshStandardMaterial color="#E4DECF" emissive="#5A5648" emissiveIntensity={0.4} roughness={0.5} metalness={0.1} />
       </mesh>
 
-      {/* Two-layer glow (fake bloom): bright warm core + wider soft halo */}
-      <sprite position={[0, LANTERN_Y, 0.05]} scale={[2.6, 2.6, 1]}>
-        <spriteMaterial map={haloGlow} transparent blending={THREE.AdditiveBlending} depthWrite={false} />
+      {/* --- Gallery / varanda: a disk far wider than the tower, the single
+          biggest silhouette-breaking element — it reads as a horizontal
+          ledge, not a continuation of the vertical body. --- */}
+      <mesh position={[0, GALLERY_Y, 0]}>
+        <cylinderGeometry args={[GALLERY_RADIUS, GALLERY_RADIUS + 0.03, 0.07, 24]} />
+        <meshStandardMaterial color="#20263A" roughness={0.5} metalness={0.2} />
+      </mesh>
+
+      {/* Guard-rail: a ring of thin posts plus a handrail — small vertical
+          notches around the gallery edge instead of a smooth disk rim. */}
+      {RAIL_POSTS.map(([x, z], i) => (
+        <mesh key={i} position={[x, GALLERY_Y + 0.1, z]}>
+          <cylinderGeometry args={[0.008, 0.008, 0.14, 6]} />
+          <meshStandardMaterial color="#12151F" roughness={0.6} metalness={0.3} />
+        </mesh>
+      ))}
+      <mesh position={[0, GALLERY_Y + 0.16, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[GALLERY_RADIUS - 0.03, 0.01, 6, 24]} />
+        <meshStandardMaterial color="#12151F" roughness={0.5} metalness={0.35} />
+      </mesh>
+
+      {/* --- Lantern room: narrower than the gallery, dark mullions over a
+          warm "lit glass" body so it reads as windows, not a solid drum. --- */}
+      <mesh position={[0, LANTERN_Y, 0]}>
+        <cylinderGeometry args={[0.22, 0.24, LANTERN_ROOM_HEIGHT, 16]} />
+        <meshStandardMaterial
+          color="#FFE0C9"
+          emissive="#FF8F73"
+          emissiveIntensity={0.55}
+          roughness={0.4}
+          metalness={0.05}
+        />
+      </mesh>
+      {Array.from({ length: 8 }, (_, i) => {
+        const angle = (i / 8) * Math.PI * 2;
+        const r = 0.235;
+        return (
+          <mesh
+            key={i}
+            position={[Math.cos(angle) * r, LANTERN_Y, Math.sin(angle) * r]}
+            rotation={[0, -angle, 0]}
+          >
+            <boxGeometry args={[0.014, LANTERN_ROOM_HEIGHT, 0.03]} />
+            <meshStandardMaterial color="#12151F" roughness={0.7} metalness={0.15} />
+          </mesh>
+        );
+      })}
+      <mesh position={[0, LANTERN_Y + LANTERN_ROOM_HEIGHT / 2, 0]}>
+        <torusGeometry args={[0.23, 0.012, 8, 24]} />
+        <meshStandardMaterial color="#FFD9C7" emissive="#FF8F73" emissiveIntensity={0.7} roughness={0.4} />
+      </mesh>
+      <mesh position={[0, LANTERN_Y - LANTERN_ROOM_HEIGHT / 2, 0]}>
+        <torusGeometry args={[0.24, 0.012, 8, 24]} />
+        <meshStandardMaterial color="#12151F" roughness={0.5} metalness={0.3} />
+      </mesh>
+
+      {/* --- Roof: a short, faceted cone (angular, not an oval dome) with a
+          small metal finial on top. --- */}
+      <mesh position={[0, ROOF_Y - 0.07, 0]}>
+        <coneGeometry args={[0.27, 0.28, 8]} />
+        <meshStandardMaterial color="#181E2C" roughness={0.5} metalness={0.25} />
+      </mesh>
+      <mesh position={[0, ROOF_Y + 0.1, 0]}>
+        <cylinderGeometry args={[0.012, 0.012, 0.13, 8]} />
+        <meshStandardMaterial color="#3A2A24" roughness={0.3} metalness={0.5} />
+      </mesh>
+      <mesh position={[0, ROOF_Y + 0.17, 0]}>
+        <sphereGeometry args={[0.03, 12, 12]} />
+        <meshStandardMaterial color="#FFD9C7" emissive="#FF8F73" emissiveIntensity={0.5} roughness={0.3} metalness={0.4} />
+      </mesh>
+
+      {/* Two-layer glow (fake bloom): bright warm core + a controlled, much
+          smaller halo — the previous halo (scale 2.6) circled the entire
+          tower top; this one stays inside the lantern room's own footprint. */}
+      <sprite position={[0, LANTERN_Y, 0.05]} scale={[1.5, 1.5, 1]}>
+        <spriteMaterial map={haloGlow} transparent blending={THREE.AdditiveBlending} depthWrite={false} opacity={0.75} />
       </sprite>
-      <sprite position={[0, LANTERN_Y, 0.1]} scale={[1.5, 1.5, 1]}>
+      <sprite position={[0, LANTERN_Y, 0.1]} scale={[0.9, 0.9, 1]}>
         <spriteMaterial map={coreGlow} transparent blending={THREE.AdditiveBlending} depthWrite={false} />
       </sprite>
 
